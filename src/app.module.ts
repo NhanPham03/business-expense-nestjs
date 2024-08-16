@@ -9,6 +9,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { Staff } from './staffs/entities/staff.entity';
 import { Project } from './projects/entities/project.entity';
 import { Claim } from './claims/entities/claim.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { Claim } from './claims/entities/claim.entity';
     ClaimsModule,
     StaffsModule,
     ProjectsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
