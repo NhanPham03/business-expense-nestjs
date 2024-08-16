@@ -7,6 +7,4 @@ export class CreateClaimDto {
   project: CreateProjectDto;
   
   remarks: string;
-  created_at: string;
-  updated_at: string;
 }

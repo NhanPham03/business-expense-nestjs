@@ -3,32 +3,33 @@ import { CreateClaimDto } from './dto/create-claim.dto';
 import { UpdateClaimDto } from './dto/update-claim.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Claim } from './entities/claim.entity';
-import { Repository } from 'typeorm';
+import { MongoRepository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class ClaimsService {
   constructor(
     @InjectRepository(Claim)
-    private readonly claimRepository: Repository<Claim>,
+    private readonly claimRepository: MongoRepository<Claim>,
   ) {}
 
   async create(createClaimDto: CreateClaimDto) {
     return await this.claimRepository.save(createClaimDto);
   }
 
-  findAll() {
-    return `This action returns all claims`;
+  async findAll() {
+    return await this.claimRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} claim`;
+  async findOne(id: string) {
+    return await this.claimRepository.findOne({ where: { _id: new ObjectId(id) } });
   }
 
-  update(id: number, updateClaimDto: UpdateClaimDto) {
-    return `This action updates a #${id} claim`;
+  async update(id: string, updateClaimDto: UpdateClaimDto) {
+    return await this.claimRepository.update({ _id: new ObjectId(id) }, updateClaimDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} claim`;
+  async remove(id: string) {
+    return await this.claimRepository.delete({ _id: new ObjectId(id) });
   }
 }
