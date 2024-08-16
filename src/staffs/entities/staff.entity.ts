@@ -1,10 +1,10 @@
 import { Column, Entity, ObjectId, ObjectIdColumn } from "typeorm";
 
 export enum Roles {
-  CLAIMER = "claimer",
-  APPROVER = "approver",
-  FINANCE = "finance",
-  ADMIN = "admin",
+  Claimer = "claimer",
+  Approver = "approver",
+  Finance = "finance",
+  Admin = "admin",
 }
 
 @Entity("staffs")
@@ -22,7 +22,7 @@ export class Staff {
   rank: string;
 
   @Column({ type: "enum", enum: Roles })
-  private _role: Roles;
+  role: Roles;
 
   @Column()
   email: string;
@@ -30,7 +30,7 @@ export class Staff {
   @Column()
   password: string;
 
-  @Column({ default: true })
+  @Column()
   active: boolean;
 
   @Column({ type: "date" })
@@ -38,12 +38,4 @@ export class Staff {
 
   @Column({ type: "date" })
   updated_at: string;
-
-  get role(): string {
-    return this._role.charAt(0).toUpperCase() + this._role.slice(1);
-  }
-
-  set role(value: Roles) {
-    this._role = value.toLowerCase() as Roles;
-  }
 }
