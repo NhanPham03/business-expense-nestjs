@@ -1,12 +1,22 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, HttpCode, Post, Request, Res, UseGuards } from '@nestjs/common';
+import { LocalAuthGuard } from './auth/local-auth.guard';
+import { AuthService } from './auth/auth.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private authService: AuthService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @UseGuards(LocalAuthGuard)
+  @Post('login')
+  @HttpCode(200)
+  async login(@Request() req, @Res() res) {
+    const accessToken = await this.authService.login(req.user); // Must be "user" due to Passport setup
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    return res.send({ message: "Login successful" });
   }
 }
