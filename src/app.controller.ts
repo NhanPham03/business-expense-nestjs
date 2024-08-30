@@ -1,6 +1,7 @@
-import { Controller, HttpCode, Post, Request, Res, UseGuards } from '@nestjs/common';
+import { Controller, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
+import { Request, Response } from 'express';
 
 @Controller()
 export class AppController {
@@ -9,14 +10,19 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(200)
-  async login(@Request() req, @Res() res) {
-    const accessToken = await this.authService.login(req.user); // Must be "user" due to Passport setup
-    res.cookie("access_token", accessToken, {
+  async login(@Req() req: Request, @Res() res: Response) {
+    const data = await this.authService.login(req.user); // Must be "user" due to Passport setup
+
+    res.cookie("accessToken", data.accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none", // Set to "strict" when in production
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
-    return res.send({ message: "Login successful" });
+    return res.send({
+      token: data.accessToken,
+      user: data.user, 
+    });
   }
 }

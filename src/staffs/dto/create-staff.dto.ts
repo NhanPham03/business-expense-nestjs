@@ -12,6 +12,10 @@ export class CreateStaffDto {
   department?: string;
 
   @IsString()
+  @Transform(({ value }) => value ?? "Unknown")
+  job_title?: string;
+
+  @IsString()
   @Transform(({ value }) => value ?? "N/A")
   rank?: string;
 

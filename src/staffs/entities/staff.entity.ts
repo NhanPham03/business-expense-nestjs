@@ -19,6 +19,9 @@ export class Staff {
   department: string;
 
   @Column()
+  job_title: string;
+
+  @Column()
   rank: string;
 
   @Column({ type: "enum", enum: Roles })

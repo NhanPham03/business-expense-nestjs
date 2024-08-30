@@ -10,6 +10,7 @@ import { Staff } from './staffs/entities/staff.entity';
 import { Project } from './projects/entities/project.entity';
 import { Claim } from './claims/entities/claim.entity';
 import { AuthModule } from './auth/auth.module';
+import { DepartmentsModule } from './departments/departments.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
     StaffsModule,
     ProjectsModule,
     AuthModule,
+    DepartmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
