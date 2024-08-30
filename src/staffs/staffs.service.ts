@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Roles, Staff } from './entities/staff.entity';
+import { Staff } from './entities/staff.entity';
 import { MongoRepository } from 'typeorm';
 import { ObjectId } from 'mongodb';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class StaffsService {
@@ -15,14 +16,22 @@ export class StaffsService {
 
   // #region CREATE
   async create(createStaffDto: CreateStaffDto) {
-    const staff = this.staffRepository.create({ 
-      ...createStaffDto, 
-      active: true,
-      created_at: new Date().toISOString(), 
-      updated_at: new Date().toISOString(), 
-    });
+    try {
+      const hashedPassword = await hash(createStaffDto.password, 10);
 
-    return await this.staffRepository.save(staff);
+      const staff = this.staffRepository.create({ 
+        ...createStaffDto, 
+        password: hashedPassword, // Hash with bcrypt
+        active: true,
+        created_at: new Date().toISOString(), 
+        updated_at: new Date().toISOString(), 
+      });
+
+      return await this.staffRepository.save(staff);
+    } catch (error) {
+      if (error.code === 11000) throw new BadRequestException("Email is already taken");
+      throw error;
+    }
   }
   // #endregion
 
@@ -42,10 +51,16 @@ export class StaffsService {
 
   // #region UPDATE
   async update(id: string, updateStaffDto: UpdateStaffDto) {
-    return await this.staffRepository.update({ _id: new ObjectId(id) }, { 
-      ...updateStaffDto, 
-      updated_at: new Date().toISOString(), 
-    });
+    const updateData: Partial<Staff> = {
+      ...updateStaffDto,
+      updated_at: new Date().toISOString(),
+    }
+    
+    if (updateStaffDto.password) {
+      updateData.password = await hash(updateStaffDto.password, 10);
+    }
+
+    return await this.staffRepository.update({ _id: new ObjectId(id) }, updateData);
   }
 
   async activate(id: string) {
