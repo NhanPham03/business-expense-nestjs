@@ -3,12 +3,19 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { jwtConstants } from './constants';
 import { StaffsService } from 'src/staffs/staffs.service';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private staffsService: StaffsService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // jwtFromRequest: (req: Request) => {
+      //   if (req && req.cookies) {
+      //     return req.cookies["accessToken"];
+      //   }
+      //   return null;
+      // },
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secret,
     });
@@ -22,7 +29,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return { 
       _id: payload.sub, 
-      name: payload.name, 
+      name: payload.name,
+      department: payload.department, 
       role: payload.role, 
     };
   }
